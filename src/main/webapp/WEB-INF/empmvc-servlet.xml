@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:p="http://www.springframework.org/schema/p"
+xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:mvc="http://www.springframework.org/schema/mvc"
+
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+ http://www.springframework.org/schema/tx 
+ http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       <!-- HandlerMapper -->
+       
+       <context:annotation-config></context:annotation-config>
+       <context:component-scan base-package="com.ems"></context:component-scan>
+       
+        <bean id="myBeansValidator"
+        class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+       <mvc:annotation-driven  validator="myBeansValidator"  />
+     
+
+       
+       <!-- Beans Rquired -->
+       
+       <!-- Data Source -->
+       
+       <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+       <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+       <property name="url" value="jdbc:mysql://localhost:3306/vlems"></property>
+       <property name="username" value="root"></property>
+       <property name="password" value="root"></property>
+       </bean>
+       
+       <!--  Session Factory -->
+       
+       <bean id="mysessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+       <property name="dataSource" ref="ds"></property>
+       <!-- Hibernate properties -->
+       <property name="hibernateProperties">
+       <props>
+       
+       <prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
+       <prop key="hibernate.show_sql">true</prop>
+       <prop key="hibernate.hbm2ddl.auto">update</prop>
+       <!-- validate : update : create  : create-drop-->
+       </props>
+       
+       
+       </property>
+       
+       <property name="annotatedClasses">
+       
+        <list>
+        <value>com.ems.model.Employee</value>
+        </list>
+       </property>
+       </bean>
+       
+       
+       <!-- Hibernate Template -->
+       
+       
+       <bean id="hibernateTemplate"  class="org.springframework.orm.hibernate5.HibernateTemplate">
+       
+       <property name="sessionFactory" ref="mysessionFactory"></property>
+     
+      
+     
+       </bean>
+       
+       
+       
+       <tx:annotation-driven  transaction-manager="transactionManager"/>
+<bean name="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+
+<property name="sessionFactory" ref="mysessionFactory"></property>
+
+</bean>
+       
+       
+       <!-- View Resolver -->
+       
+       <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+       <property name="prefix" value="/"></property>
+       <property name="suffix" value=".jsp"></property>
+       
+       
+       </bean>
+       
+       <mvc:resources location="/resources/" mapping="/resources/**"></mvc:resources>
+       
+       </beans>
